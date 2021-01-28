@@ -1,11 +1,12 @@
 local supported_devices = {
   midi_devices = {
-    {  midi_base_name= 'launchpad',        device_type='launchpad'     },
-    {  midi_base_name= 'launchpad mini',   device_type='launchpad'     },
-    {  midi_base_name= 'launchpad mini mk3 2', device_type='launchpad_minimk3' },
-    {  midi_base_name= 'launchpad mini mk3 2 2', device_type='launchpad_minimk3_128' },
-    {  midi_base_name= 'apc mini',         device_type='apc_mini'      },
-    {  midi_base_name= 'block 1',          device_type='livid_block'   },
+    {  midi_base_name= 'launchpad',               device_type='launchpad'     },
+    {  midi_base_name= 'launchpad mini',          device_type='launchpad'     },
+    {  midi_base_name= 'launchpad mini 2',        device_type='launchpad_90cw' },
+    {  midi_base_name= 'launchpad mini mk3 2',    device_type='launchpad_minimk3' },
+    {  midi_base_name= 'launchpad mini mk3 2 2',  device_type='launchpad_minimk3_128' },
+    {  midi_base_name= 'apc mini',                device_type='apc_mini'      },
+    {  midi_base_name= 'block 1',                 device_type='livid_block'   },
 --[[ Known devices to be implemented, help required!
      Old launchpad mini's have user set hardware ID 1 - 16:
      e.g. ID 4 appears as midi_device.name "Launchpad Mini 4"
