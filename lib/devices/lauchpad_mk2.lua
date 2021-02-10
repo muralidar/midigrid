@@ -1,3 +1,7 @@
+--
+-- Not sure this is required. Should at least inherit from launchpad or launchpad_rgb
+--
+
 local launchpad = include('midigrid/lib/devices/generic_device')
 
 launchpad.grid_notes= {
@@ -12,7 +16,5 @@ launchpad.grid_notes= {
 }
 
 launchpad.brightness_map = {0,28,28,60,60,60,62,62,29,29,29,63,63,13,13,15}
-
-launchpad.device_name = 'launchpad'
 
 return launchpad

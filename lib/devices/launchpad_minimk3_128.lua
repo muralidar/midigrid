@@ -1,4 +1,4 @@
-local launchpad = include('midigrid/lib/devices/launchpad_minimk3')
+local launchpad = include('midigrid/lib/devices/launchpad_rgb')
 
 --Rotate the second LP, by transposing the grid notes.
 

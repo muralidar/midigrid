@@ -1,7 +1,17 @@
 local supported_devices = {
   midi_devices = {
-    {  midi_base_name= 'launchpad',        device_type='launchpad'     },
-    {  midi_base_name= 'launchpad mini',   device_type='launchpad'     },
+    
+    -- Misc grid devices
+    
+    {  midi_base_name= 'apc mini',         device_type='apc_mini'      },
+    {  midi_base_name= 'block 1',          device_type='livid_block'   },
+    
+    -- Novation Launchpads 
+    
+    {  midi_base_name= 'launchpad',        device_type='launchpad'       },
+    {  midi_base_name= 'launchpad s',      device_type='launchpad'       },
+    {  midi_base_name= 'launchpad mini',   device_type='launchpad'       },
+    {  midi_base_name= 'launchpad mk2',    device_type='launchpad_rgb'   },
     --
     -- LP Mini MK3 presents two MIDI interfaces over USB:
     --   launchpad mini mk3 1 - LPMiniMK3 DAW I/O (or first interface): For use
@@ -12,14 +22,13 @@ local supported_devices = {
     --                        external MIDI input or Light controls in
     --                        Lighting Custom Modes and Programmer mode.
     --
-    -- LP Mini MK3 needs to be put in Programmer mode manually for midigrid use.
-    {  midi_base_name= 'launchpad mini mk3 2', device_type='launchpad_minimk3' },
     -- A second LP Mini MK3 displays these device names:
     --   launchpad mini mk3 1 2
     --   launchpad mini mk3 2 2
+    -- LP Mini MK3 needs to be put in Programmer mode manually for midigrid use.
+    {  midi_base_name= 'launchpad mini mk3 2', device_type='launchpad_minimk3' },
     {  midi_base_name= 'launchpad mini mk3 2 2', device_type='launchpad_minimk3_128' },
-    {  midi_base_name= 'apc mini',         device_type='apc_mini'      },
-    {  midi_base_name= 'block 1',          device_type='livid_block'   },
+    
 --[[ Known devices to be implemented, help required!
      Old launchpad mini's have user set hardware ID 1 - 16:
      e.g. ID 4 appears as midi_device.name "Launchpad Mini 4"
