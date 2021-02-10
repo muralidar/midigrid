@@ -20,6 +20,4 @@ launchpad.grid_notes= {
   {81,71,61,51,41,31,21,11}
 }
 
-launchpad.device_name = 'launchpad_minimk3_128'
-
 return launchpad

@@ -38,6 +38,4 @@ launchpad.brightness_map = {0,
   119
 }
 
-launchpad.device_name = 'launchpad_minimk3'
-
 return launchpad

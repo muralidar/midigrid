@@ -13,6 +13,4 @@ block.grid_notes= {
 
 --block.reset_device_msg = { 0xB0, 0x00, 0x00 }
 
-block.device_name = 'block 1'
-
 return block

@@ -49,6 +49,4 @@ function launchpad:cc_handler(vgrid,midi_msg)
   end
 end
 
-launchpad.device_name = 'launchpad'
-
 return launchpad
