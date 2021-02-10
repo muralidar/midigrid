@@ -1,3 +1,9 @@
+--
+-- Sorry this script doesn't 
+--    do anything useful 
+--         yet...
+--
+
 local device = include('midigrid/lib/devices/launchpad')
 --local device2 = include('midigrid/devices/launchpad')
 

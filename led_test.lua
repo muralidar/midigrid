@@ -1,5 +1,10 @@
+-- midigrid LED test
+-- 
+-- K3 - Start LED test
+-- K2 - Stop LED test
+
 local grid = include "midigrid/lib/midigrid"
---grid:init('128')
+grid:init('128')
 local g = grid.connect()
 
 local grid_metro = metro.init()
