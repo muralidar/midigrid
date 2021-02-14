@@ -1,9 +1,13 @@
--- Randomly change launchpad LEDs 
--- except the first 2 columns
---
--- looks for the ghosts
+-- Randomly lights launchpad LED 
+-- Expects LP on Midi device 1
+-- 
+-- Compatible LP mini mk 1 & 2    
+--                              
+--   looks for the ghost LEDs
+--                               
+--                             (=o
 
-local m = midi.connect(2)
+local m = midi.connect(1)
 m.event = function(data) tab.print(data) end
 
 local grid_metro = metro.init()
@@ -26,7 +30,8 @@ local notes =  {
     --97, 
     98, 99,100,101,102,103, 104,
     --113,
-    114,115,116,117,118,119,120  }
+    114,115,116,117,118,119,120  
+    }
 
 grid_metro.event = function()
   for n = 1,#notes do
