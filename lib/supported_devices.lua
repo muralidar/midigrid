@@ -31,6 +31,8 @@ local supported_devices = {
     -- LP Mini MK3 needs to be put in Programmer mode manually for midigrid use.
     {  midi_base_name= 'launchpad mini mk3 2', device_type='launchpad_minimk3' },
     {  midi_base_name= 'launchpad mini mk3 2 2', device_type='launchpad_minimk3_128' },
+    {  midi_base_name= 'launchpad x 1', device_type='launchpad_x' },
+    {  midi_base_name= 'launchpad x 2', device_type='launchpad_x' },
     
 --[[ Known devices to be implemented, help required!
      Old launchpad mini's have user set hardware ID 1 - 16:
