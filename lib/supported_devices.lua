@@ -5,7 +5,10 @@ local supported_devices = {
     
     {  midi_base_name= 'apc mini',         device_type='apc_mini'      },
     {  midi_base_name= 'block 1',          device_type='livid_block'   },
-    
+
+    -- Ableton Push 2
+    {  midi_base_name= 'ableton push 2 1',          device_type='push2'   },
+
     -- Novation Launchpads 
     
     {  midi_base_name= 'launchpad',        device_type='launchpad'       },
