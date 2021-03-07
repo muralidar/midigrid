@@ -52,6 +52,16 @@ function midigrid.connect(dummy_id)
 
   print("Connected devices:")
   tab.print(connected_devices)
+  
+  --Look for a context for the currenty running script
+  context_file = "midigrid/lib/contexts/"..norns.state.name
+  print(_path.code .. context_file .. ".lua")
+  if (util.file_exists(_path.code .. context_file .. ".lua")) then
+    print("Found midigrid context for " .. norns.state.name)
+    include(context_file)
+  else
+    print("No midigrid context for " .. norns.state.name .. " was found")
+  end
 
   vgrid:attach_devices(connected_devices)
 
