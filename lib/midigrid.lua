@@ -58,7 +58,8 @@ function midigrid.connect(dummy_id)
   print(_path.code .. context_file .. ".lua")
   if (util.file_exists(_path.code .. context_file .. ".lua")) then
     print("Found midigrid context for " .. norns.state.name)
-    include(context_file)
+    context = include(context_file)
+    context.start(connected_devices)
   else
     print("No midigrid context for " .. norns.state.name .. " was found")
   end
