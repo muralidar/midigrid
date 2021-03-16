@@ -33,6 +33,20 @@ launchpad.brightness_map = {0,16,16,32,32,48,48,49,49,33,33,50,50,34,34,51}
 
 launchpad.reset_device_msg = { 0xB0, 0x00, 0x00 }
 
+--top to bottom
+launchpad.auxcol = {
+  {'note',   8, 1},
+  {'note',  24, 2},
+  {'note',  40, 3},
+  {'note',  56, 4},
+  {'note',  72, 10},
+  {'note',  88, 12},
+  {'note', 104, 14},
+  {'note', 120, 16}
+}
+--left to right
+launchpad.auxrow = {CC = {104,105,106,107,108,109,110,111}}
+
 
 launchpad.cc_event_handlers = {}
 

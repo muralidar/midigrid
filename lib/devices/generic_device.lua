@@ -23,9 +23,9 @@ local device={
 
   --these are the keys in the apc to the sides of our apc, not necessary for strict grid emulation but handy!
   --they are up to down, so 82 is the auxkey to row 1
-  auxcol = {82,83,84,85,86,87,88,89},
+  auxcol = {notes = {82,83,84,85,86,87,88,89}},
   --left to right, 64 is aux key to column 1
-  auxrow = {64,65,66,67,68,69,70,71},
+  auxrow = {notes = {64,65,66,67,68,69,70,71}},
 
   --as of now, order is important here
   quad_leds = {notes = {64,65,66,67}},
@@ -47,7 +47,6 @@ function device:brightness_handler(val)
 end
 
 function device:change_quad(quad)
-
     self.current_quad = quad
     self.force_full_refresh = true
 end
@@ -88,9 +87,11 @@ function device.event(self,vgrid,event)
       -- adding quad change from midinotes as defined in 'generic device'
       -- if the key is not found in the grid lookup, look it up in the quad one..
       local quad_index = nil
-      for index, value in ipairs(self.quad_leds.notes) do
-        if (value == midi_msg.note) then
-          quad_index = index
+      if (self.quad_leds.notes) then
+        for index, value in ipairs(self.quad_leds.notes) do
+          if (value == midi_msg.note) then
+            quad_index = index
+          end
         end
       end
       if quad_index then
@@ -131,6 +132,25 @@ function device:refresh(quad)
 end
 
 function device:update_aux()
+  if self.auxrow then
+    for _,button in ipairs(self.auxrow) do
+      if button[1] == 'CC' then
+        self:_send_cc(button[2],button[3])
+      else
+        self:_send_note(button[2],button[3])
+      end
+    end
+  end
+  if self.auxcol then
+    for _,button in ipairs(self.auxcol) do
+      if button[1] == 'CC' then
+        self:_send_cc(button[2],button[3])
+      else
+        self:_send_note(button[2],button[3])
+      end
+    end
+  end
+  
   --TODO: Aux Rows / Cols
   if self.quad_leds.notes then
     for q = 1,4 do
@@ -150,6 +170,12 @@ function device:update_aux()
       if midi.devices[self.midi_id] then midi.devices[self.midi_id]:send(midi_msg) end
     end
   end
+end
+
+function device:_send_note(note,z)
+  local vel = self.brightness_map[z]
+  local midi_msg = {0x90,cc,vel}
+  if midi.devices[self.midi_id] then midi.devices[self.midi_id]:send(midi_msg) end
 end
 
 function device:_send_cc(cc,z)
