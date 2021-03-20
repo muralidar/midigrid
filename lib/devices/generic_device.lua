@@ -214,10 +214,12 @@ end
 function device:rotate_ccw()
   -- Rotate the grid
   local new_grid_notes = {}
+  local row_offset = #self.grid_notes+1
   for col = 1,#self.grid_notes[1] do
-    new_grid_notes[col] = {}
+    new_grid_notes[row_offset-col] = {}
     for row = 1,#self.grid_notes do
-      new_grid_notes[col][row] = self.grid_notes[row][col]
+      --print (row_offset-col,',',row,' -- ',row,',',col)
+      new_grid_notes[row_offset-col][row] = self.grid_notes[row][col]
     end
   end
   self.grid_notes = new_grid_notes
