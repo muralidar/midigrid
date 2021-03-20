@@ -76,9 +76,6 @@ function Vgrid:attach_device(dev)
   -- e.g. dev1 = quad1, dev2 = quad2, ...
   dev.current_quad = ((tab.count(self.devices)-1) % tab.count(self.quads))+1
   table.insert(self.devices,dev)
-  
-  -- Create reverse lookup tables for device
-  dev:create_rev_lookups()
 
   -- Set call back for real device events to become virtual grid events
   midi.devices[dev.midi_id].event = function(e) dev.event(dev,self,e) end
@@ -91,6 +88,8 @@ function Vgrid:attach_device(dev)
   if dev._init then
     dev:_init(self)
   end
+  -- Reset the device
+  dev:_reset()
 end
 
 function Vgrid:_handle_grid_key(quad_id,qx,qy,state)

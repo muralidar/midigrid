@@ -66,15 +66,21 @@ end
 function device:_init(vgrid)
   self.vgrid = vgrid
   
+  -- Create reverse lookup tables for device
+  self:create_rev_lookups()
+  
+  -- Tabls for aux button handlers
   self.aux.row.handlers = {}
   self.aux.col.handlers = {}
   
+  -- Auto create Quad switching handlers
   if #vgrid.quads > 1 then
     for q = 1,#vgrid.quads do
       self.aux.row.handlers[q] = function(self,val) self:change_quad(q) end
     end
   end
   
+  -- Reset device
   self:_reset()
 end
 
