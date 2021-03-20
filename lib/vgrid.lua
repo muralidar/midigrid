@@ -89,10 +89,8 @@ function Vgrid:attach_device(dev)
 
   -- Call device init if set
   if dev._init then
-    dev:_init()
+    dev:_init(self)
   end
-  -- Reset the device
-  dev:_reset()
 end
 
 function Vgrid:_handle_grid_key(quad_id,qx,qy,state)

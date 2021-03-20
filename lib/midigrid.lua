@@ -15,6 +15,7 @@ local vgrid = include('midigrid/lib/vgrid')
 local supported_devices = include('midigrid/lib/supported_devices')
 
 local midigrid = {
+  is_midigrid = true,
   vgrid = vgrid,
   core_grid = grid,
   core_midi_add = nil,

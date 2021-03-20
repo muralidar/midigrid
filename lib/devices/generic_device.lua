@@ -15,13 +15,16 @@ local device={
   width=8,
   height=8,
 
+  vgrid={},
   midi_id = 1,
   refresh_counter = 0,
 
   -- This MUST contain 15 values that corospond to brightness. these can be strings or tables if you midi send handler requires (e.g. RGB)
   brightness_map = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},
 
-
+  -- This defines any Aux buttons, it expects at least one row and one column of 8 buttons
+  -- See launchpad.lua for an example. More than 8 buttons could be used for multple row/cols (i.e. LP Mk3 Pro)
+  -- Format is { 'cc'/'note', cc or note number, current/default state }
   aux = {
     col = {},
     row = {}
@@ -31,6 +34,7 @@ local device={
   quad_leds = {notes = {64,65,66,67}},
 
   -- the currently displayed quad on the device
+  quad_switching_enabled = true,
   current_quad = 1,
   -- here we set the buttons to use when switching quads in multi-quad mode
 
@@ -51,13 +55,27 @@ function device:change_quad(quad)
     self.force_full_refresh = true
 end
 
-function device._reset(self)
-  print("device._reset")
+function device:_reset()
   if self.reset_device_msg then
     midi.devices[self.midi_id]:send(self.reset_device_msg)
   else
     --TODO: Reset all leds on device
   end
+end
+
+function device:_init(vgrid)
+  self.vgrid = vgrid
+  
+  self.aux.row.handlers = {}
+  self.aux.col.handlers = {}
+  
+  if #vgrid.quads > 1 then
+    for q = 1,#vgrid.quads do
+      self.aux.row.handlers[q] = function(self,val) self:change_quad(q) end
+    end
+  end
+  
+  self:_reset()
 end
 
 function device._update_led(self,x,y,z)
@@ -78,36 +96,15 @@ function device.event(self,vgrid,event)
 
   -- device-dependent. Reject cc "notes" here.
   if (midi_msg.type == 'note_on' or midi_msg.type == 'note_off') then
-
     local key = self.note_to_grid_lookup[midi_msg.note]
+    local key_state = (midi_msg.type == 'note_on') and 1 or 0
     if key then
-      local key_state = (midi_msg.type == 'note_on') and 1 or 0
       self._key_callback(self.current_quad,key['x'],key['y'],key_state)
     else
-      -- adding quad change from midinotes as defined in 'generic device'
-      -- if the key is not found in the grid lookup, look it up in the quad one..
-      local quad_index = nil
-      if (self.quad_leds.notes) then
-        for index, value in ipairs(self.quad_leds.notes) do
-          if (value == midi_msg.note) then
-            quad_index = index
-          end
-        end
-      end
-      if quad_index then
-        self:change_quad(quad_index)
-      else
-        print("Unhandled midi note: " .. midi_msg.note)
-      end
+      self:_aux_btn_handler('note',midi_msg.note,key_state)
     end
   elseif (midi_msg.type == 'cc') then
-
-    if (self.cc_handler) then
-      self:cc_handler(vgrid,midi_msg)
-    else
-      -- unhandled CC msg, please leave commented, devices with rotatry encoders or pots output a lot of CC messages.
-      --print('Unhandled CC '.. midi_msg.cc)
-    end
+    self:_aux_btn_handler('cc',midi_msg.cc,(midi_msg.val>0) and 1 or 0)
   end
 end
 
@@ -130,19 +127,49 @@ function device:refresh(quad)
   self:update_aux()
 end
 
+function device:_aux_btn_handler(type, msg, state)
+  local aux_event
+  if type == 'cc' then
+    aux_event = self.aux.cc_lookup[msg]
+  else
+    aux_event = self.aux.note_lookup[msg]
+  end
+  
+  if aux_event and aux_event[1] == 'row' then
+    device:aux_row_handler(aux_event[2], state)
+  elseif aux_event and aux_event[1] == 'col' then
+    device:aux_col_handler(aux_event[2], state)
+  else
+    print 'Unrecognised Aux button event'
+  end
+end
+
+function device:aux_row_handler(btn,val)
+  if (self.aux and self.aux.row and self.aux.row.handlers and self.aux.row.handlers[btn]) then
+    self.aux.row.handlers[btn](self,val)
+  end
+end
+
+function device:aux_col_handler(btn,val)
+  if (self.aux and self.aux.col and self.aux.col.handlers and self.aux.col.handlers[btn]) then
+    self.aux.col.handlers[btn](self,val)
+  end
+end
+
 function device:update_aux()
-  -- Set the current Quad state
-  -- TODO would be good to only update on quad switch?
-  for q = 1,4 do
-    if self.current_quad == q then z = 16 else z = 1 end
-    if self.aux.row and #self.aux.row >= 4 then
-      self.aux.row[q][3] = z
+  -- TODO would be good to only update on dirty AUX?
+  if self.vgrid and #self.vgrid.quads > 1 and self.quad_switching_enabled == true then
+    for q = 1,#self.vgrid.quads do
+      if self.current_quad == q then z = 16 else z = 2 end
+      if self.aux.row and #self.aux.row >= 4 then
+        self.aux.row[q][3] = z
+      end
     end
   end
   -- Light the Aux LEDs
   if self.aux.row then
     for _,button in ipairs(self.aux.row) do
-      if button[1] == 'CC' then
+      if button[1] == 'cc' then
         self:_send_cc(button[2],button[3])
       else
         self:_send_note(button[2],button[3])
@@ -151,33 +178,13 @@ function device:update_aux()
   end
   if self.aux.col then
     for _,button in ipairs(self.aux.col) do
-      if button[1] == 'CC' then
+      if button[1] == 'cc' then
         self:_send_cc(button[2],button[3])
       else
         self:_send_note(button[2],button[3])
       end
     end
   end
-  --[[
-  if self.quad_leds.notes then
-    for q = 1,4 do
-      if self.current_quad == q then z = 16 else z = 1 end
-      local vel = self.brightness_map[z]
-      local note = self.quad_leds.notes[q]
-      local midi_msg = {0x90,note,vel}
-      if midi.devices[self.midi_id] then midi.devices[self.midi_id]:send(midi_msg) end
-    end
-  end
-  if self.quad_leds.CC then
-    for q = 1,4 do
-      if self.current_quad == q then z = 16 else z = 1 end
-      local vel = self.brightness_map[z]
-      local cc = self.quad_leds.CC[q]
-      local midi_msg = {0xb0,cc,vel}
-      if midi.devices[self.midi_id] then midi.devices[self.midi_id]:send(midi_msg) end
-    end
-  end
-  ]]
 end
 
 function device:_send_note(note,z)
@@ -193,9 +200,32 @@ function device:_send_cc(cc,z)
 end
 
 function device:create_rev_lookups()
+  --Create reverse lookup for grid notes
   for col = 1,self.height do
     for row = 1,self.width do
       self.note_to_grid_lookup[self.grid_notes[col][row]] = {x=row,y=col}
+    end
+  end
+  
+  --Create reverse lookup for aux col and row
+  if self.aux and self.aux.cc_lookup == nil then self.aux.cc_lookup = {} end
+  if self.aux and self.aux.note_lookup == nil then self.aux.note_lookup = {} end  
+  if self.aux.row then
+    for btn_number,btn_meta in ipairs(self.aux.row) do
+      if btn_meta[1] == 'cc' then
+        self.aux.cc_lookup[btn_meta[2]] = {'row', btn_number}
+      else
+        self.aux.note_lookup[btn_meta[2]] = {'row', btn_number}
+      end
+    end
+  end
+  if self.aux.col then
+    for btn_number,btn_meta in ipairs(self.aux.col) do
+      if btn_meta[1] == 'cc' then
+        self.aux.cc_lookup[btn_meta[2]] = {'col', btn_number}
+      else
+        self.aux.note_lookup[btn_meta[2]] = {'col', btn_number}
+      end
     end
   end
 end

@@ -31,6 +31,7 @@ launchpad.brightness_map = {0,16,16,32,32,48,48,49,49,33,33,50,50,34,34,51}
 launchpad.reset_device_msg = { 0xB0, 0x00, 0x00 }
 
 launchpad.aux = {}
+-- Format is { 'cc'/'note', cc or note number, current/default state }
 --top to bottom
 launchpad.aux.col = {
   {'note',   8, 1},
@@ -44,20 +45,19 @@ launchpad.aux.col = {
 }
 --left to right
 launchpad.aux.row = {
-  {'CC',   104, 1},
-  {'CC',   105, 2},
-  {'CC',   106, 3},
-  {'CC',   107, 4},
-  {'CC',   108, 5},
-  {'CC',   109, 6},
-  {'CC',   110, 7},
-  {'CC',   111, 8}
+  {'cc',   104, 1},
+  {'cc',   105, 2},
+  {'cc',   106, 3},
+  {'cc',   107, 4},
+  {'cc',   108, 5},
+  {'cc',   109, 6},
+  {'cc',   110, 7},
+  {'cc',   111, 8}
 }
 
 launchpad.cc_event_handlers = {}
 
 -- "Arrow buttons"
-launchpad.quad_leds = {CC = {104,105,106,107}}
 launchpad.cc_event_handlers[104] = function(self,val) self:change_quad(1) end
 launchpad.cc_event_handlers[105] = function(self,val) self:change_quad(2) end
 launchpad.cc_event_handlers[106] = function(self,val) self:change_quad(3) end
@@ -67,7 +67,7 @@ function launchpad:cc_handler(vgrid,midi_msg)
   if self.cc_event_handlers[midi_msg.cc] then
     self.cc_event_handlers[midi_msg.cc](self,midi_msg.val)
   else
-    print('Unhandled CC '.. midi_msg.cc)
+    print('LP Unhandled CC '.. midi_msg.cc)
   end
 end
 
