@@ -225,6 +225,7 @@ function device:rotate_ccw()
   self.grid_notes = new_grid_notes
   
   --Rotate the Aux buttons
+  --TODO flip the aux column, otherwise it will be upside down
   local new_aux_row = self.aux.col
   local new_aux_col = self.aux.row
   self.aux.row = new_aux_row

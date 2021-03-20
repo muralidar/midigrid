@@ -44,20 +44,6 @@ function Vgrid:init(layout)
       self.new_quad(4,8,8,8,8)
       self.height = 16
     end
-
-  elseif layout == 'cheat_codes' then
-    -- TODO check this is correct
-    self.new_quad(1,5,8,0,0)
-    self.new_quad(2,5,8,5,0)
-    self.new_quad(3,5,8,10,0)
-    self.new_quad(4,1,8,15,0) -- Aux row
-    -- TODO cheat codes layout still needs work to mirror "AUX" row
-    self.locate_in_layout = function(self,x,y)
-      if (x > self.width or y > self.height) then return nil end
-      -- 3 grids of 5x8 + 1x8 Aux
-      return (x//6)+1
-    end
-
   else
     print("ERROR: Unknown layout " .. layout)
   end
