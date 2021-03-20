@@ -131,6 +131,7 @@ end
 
 function midigrid:rotation(dir)
   --TODO Is there a sane way to implement this with multi device?
+  --TODO impement for single 64 device
 end
 
 function midigrid:all(z)
