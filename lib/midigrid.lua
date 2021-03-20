@@ -32,6 +32,9 @@ function midigrid:init(layout)
 end
 
 function midigrid.connect(dummy_id)
+  --Only instantate midigrid once!
+  if _ENV.midigrid then return _ENV.midigrid end
+  
   if midigrid.vgrid.layout == nil then
     print("Default 64 layout init")
     -- User is calling connect without calling init, default to 64 button layout
@@ -51,13 +54,12 @@ function midigrid.connect(dummy_id)
 
   local connected_devices = midigrid._load_midi_devices(midi_devices)
 
-  print("Connected devices:")
-  tab.print(connected_devices)
-
   vgrid:attach_devices(connected_devices)
-
   midigrid.setup_connect_handling()
 
+  --Expose midigrid globally
+  _ENV.midigrid = midigrid
+  
   return midigrid
 end
 
@@ -72,15 +74,16 @@ function midigrid._find_midigrid_devices()
   local found_device = nil
   local mounted_devices = {}
 
-  print("core midi devices")
-  tab.print(midi.devices)
-
+  print(tab.count(midi.devices)," core midi devices")
+  print("Scanning for supported midigrid devices:")
   for _, dev in pairs(midi.devices) do
     found_device = supported_devices.find_midi_device_type(dev)
 
     if found_device then 
-      print("Dev" .. dev.id .." FD "..found_device)
+      print(found_device," -- Supported")
       mounted_devices[dev.id] = found_device 
+    else
+      print(dev.name," -- Not supported")
     end
   end
 

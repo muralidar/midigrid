@@ -14,6 +14,7 @@ local device={
   note_to_grid_lookup = {}, -- Intentionally left empty
   width=8,
   height=8,
+  rotate_second_device=true,
 
   vgrid={},
   midi_id = 1,
@@ -63,8 +64,13 @@ function device:_reset()
   end
 end
 
-function device:_init(vgrid)
+function device:_init(vgrid,device_number)
   self.vgrid = vgrid
+  
+  print("device number",device_number)
+  if (device_number == 2 and self.rotate_second_device) then
+    self:rotate_ccw()
+  end
   
   -- Create reverse lookup tables for device
   self:create_rev_lookups()
@@ -203,6 +209,24 @@ function device:_send_cc(cc,z)
   local vel = self.brightness_map[z]
   local midi_msg = {0xb0,cc,vel}
   if midi.devices[self.midi_id] then midi.devices[self.midi_id]:send(midi_msg) end
+end
+
+function device:rotate_ccw()
+  -- Rotate the grid
+  local new_grid_notes = {}
+  for col = 1,#self.grid_notes[1] do
+    new_grid_notes[col] = {}
+    for row = 1,#self.grid_notes do
+      new_grid_notes[col][row] = self.grid_notes[row][col]
+    end
+  end
+  self.grid_notes = new_grid_notes
+  
+  --Rotate the Aux buttons
+  local new_aux_row = self.aux.col
+  local new_aux_col = self.aux.row
+  self.aux.row = new_aux_row
+  self.aux.col = new_aux_col
 end
 
 function device:create_rev_lookups()

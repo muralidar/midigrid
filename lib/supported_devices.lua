@@ -44,7 +44,7 @@ local supported_devices = {
 }
 
 function supported_devices.find_midi_device_type(midi_device)
-  print('finding device: ' .. midi_device.id .. " with name " .. midi_device.name)
+  --print('finding device: ' .. midi_device.id .. " with name " .. midi_device.name)
   local sysex_ident_resp = nil
   -- TODO get response to sysex indentify call
 
