@@ -44,30 +44,14 @@ local device={
   device_name = 'generic'
 }
 
---function expects grid brightness from 0-15 and converts in so your midi controller can understand,
--- these values need to be adjusted for your controller!
-function device:brightness_handler(val)
-  -- remember tables start at 1, but brightness starts at 0
-  return self.brightness_map[val+1]
-end
-
 function device:change_quad(quad)
     self.current_quad = quad
     self.force_full_refresh = true
 end
 
-function device:_reset()
-  if self.reset_device_msg then
-    midi.devices[self.midi_id]:send(self.reset_device_msg)
-  else
-    --TODO: Reset all leds on device
-  end
-end
-
 function device:_init(vgrid,device_number)
   self.vgrid = vgrid
   
-  print("device number",device_number)
   if (device_number == 2 and self.rotate_second_device) then
     self:rotate_ccw()
   end
@@ -76,18 +60,26 @@ function device:_init(vgrid,device_number)
   self:create_rev_lookups()
   
   -- Tabls for aux button handlers
-  self.aux.row.handlers = {}
-  self.aux.col.handlers = {}
+  self.aux.row_handlers = {}
+  self.aux.col_handlers = {}
   
   -- Auto create Quad switching handlers
   if #vgrid.quads > 1 then
     for q = 1,#vgrid.quads do
-      self.aux.row.handlers[q] = function(self,val) self:change_quad(q) end
+      self.aux.row_handlers[q] = function(self,val) self:change_quad(q) end
     end
   end
   
   -- Reset device
   self:_reset()
+end
+
+function device:_reset()
+  if self.reset_device_msg then
+    midi.devices[self.midi_id]:send(self.reset_device_msg)
+  else
+    --TODO: Reset all leds on device
+  end
 end
 
 function device._update_led(self,x,y,z)
@@ -156,15 +148,27 @@ function device:_aux_btn_handler(type, msg, state)
   end
 end
 
+function device:aux_row_led(btn,state)
+  if (self.aux and self.aux.row and self.aux.row[btn]) then
+    self.aux.row[btn][3] = state
+  end
+end
+
+function device:aux_col_led(btn,state)
+  if (self.aux and self.aux.col and self.aux.col[btn]) then
+    self.aux.col[btn][3] = state
+  end
+end
+
 function device:aux_row_handler(btn,val)
-  if (self.aux and self.aux.row and self.aux.row.handlers and self.aux.row.handlers[btn]) then
-    self.aux.row.handlers[btn](self,val)
+  if (self.aux and self.aux.row and self.aux.row_handlers and self.aux.row_handlers[btn]) then
+    self.aux.row_handlers[btn](self,val)
   end
 end
 
 function device:aux_col_handler(btn,val)
-  if (self.aux and self.aux.col and self.aux.col.handlers and self.aux.col.handlers[btn]) then
-    self.aux.col.handlers[btn](self,val)
+  if (self.aux and self.aux.col and self.aux.col_handlers and self.aux.col_handlers[btn]) then
+    self.aux.col_handlers[btn](self,val)
   end
 end
 
@@ -172,7 +176,7 @@ function device:update_aux()
   -- TODO would be good to only update on dirty AUX?
   if self.vgrid and #self.vgrid.quads > 1 and self.quad_switching_enabled == true then
     for q = 1,#self.vgrid.quads do
-      if self.current_quad == q then z = 16 else z = 2 end
+      if self.current_quad == q then z = 15 else z = 2 end
       if self.aux.row and #self.aux.row >= 4 then
         self.aux.row[q][3] = z
       end
@@ -180,20 +184,29 @@ function device:update_aux()
   end
   -- Light the Aux LEDs
   if self.aux.row then
-    for _,button in ipairs(self.aux.row) do
-      if button[1] == 'cc' then
-        self:_send_cc(button[2],button[3])
+    for _,button in pairs(self.aux.row) do
+      if button[3] == nil then 
+        --ignore handlers!
       else
-        self:_send_note(button[2],button[3])
+        if button[1] == 'cc' then
+          self:_send_cc(button[2],button[3]+1)
+        else
+          self:_send_note(button[2],button[3]+1)
+        end
       end
     end
   end
   if self.aux.col then
-    for _,button in ipairs(self.aux.col) do
-      if button[1] == 'cc' then
-        self:_send_cc(button[2],button[3])
+    
+    for _,button in pairs(self.aux.col) do
+      if button[3] == nil then 
+      --ignore handlers!
       else
-        self:_send_note(button[2],button[3])
+        if button[1] == 'cc' then
+          self:_send_cc(button[2],button[3]+1)
+        else
+          self:_send_note(button[2],button[3]+1)
+        end
       end
     end
   end
@@ -201,12 +214,14 @@ end
 
 function device:_send_note(note,z)
   local vel = self.brightness_map[z]
+  if vel == nil then print("sent nil note") end
   local midi_msg = {0x90,note,vel}
   if midi.devices[self.midi_id] then midi.devices[self.midi_id]:send(midi_msg) end
 end
 
 function device:_send_cc(cc,z)
   local vel = self.brightness_map[z]
+  if vel == nil then print("sent nil cc") end
   local midi_msg = {0xb0,cc,vel}
   if midi.devices[self.midi_id] then midi.devices[self.midi_id]:send(midi_msg) end
 end
@@ -225,9 +240,23 @@ function device:rotate_ccw()
   self.grid_notes = new_grid_notes
   
   --Rotate the Aux buttons
-  --TODO flip the aux column, otherwise it will be upside down
-  local new_aux_row = self.aux.col
-  local new_aux_col = self.aux.row
+  --Unpack Quick&Dirty copy
+  local new_aux_row = {} --{table.unpack(self.aux.col)}
+  local new_aux_col = {}
+  
+  
+  --Flip the aux column, otherwise it will be upside down
+  for i=#self.aux.row, 1, -1 do
+    if self.aux.row[i] == nil then print("no aux row btn #",i) end
+  	new_aux_col[#new_aux_col+1] = { self.aux.row[i][1], self.aux.row[i][2], self.aux.row[i][3] }
+   end
+  
+  --Copy the aux column, otherwise it will be upside down
+  for i=1,#self.aux.col do
+    if self.aux.col[i] == nil then print("no aux row btn #",i) end
+  	new_aux_row[#new_aux_row+1] = { self.aux.col[i][1], self.aux.col[i][2], self.aux.col[i][3] }
+  end
+
   self.aux.row = new_aux_row
   self.aux.col = new_aux_col
 end

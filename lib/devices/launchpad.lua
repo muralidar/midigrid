@@ -22,7 +22,7 @@ id  color
 3, 19, 35, 51 - Full Orange
 ]]--
 -- Tropical
-launchpad.brightness_map = {0,16,16,32,32,48,48,49,49,33,33,50,50,34,34,51}
+launchpad.brightness_map = {0,16,16,32,32,48,48,49,49,33,33,50,50,34,51,51}
 -- Sunrise
 --launchpad.brightness_map = {0,16,16,32,32,48,48,49,49,50,50,33,33,51,2,3}
 -- Rainbow
@@ -31,44 +31,28 @@ launchpad.brightness_map = {0,16,16,32,32,48,48,49,49,33,33,50,50,34,34,51}
 launchpad.reset_device_msg = { 0xB0, 0x00, 0x00 }
 
 launchpad.aux = {}
--- Format is { 'cc'/'note', cc or note number, current/default state }
+-- Format is { 'cc'/'note', cc or note number, current/default state (1-16) }
 --top to bottom
 launchpad.aux.col = {
-  {'note',   8, 1},
-  {'note',  24, 2},
-  {'note',  40, 3},
-  {'note',  56, 4},
-  {'note',  72, 10},
-  {'note',  88, 12},
-  {'note', 104, 14},
-  {'note', 120, 16}
+  {'note',   8, 0},
+  {'note',  24, 0},
+  {'note',  40, 0},
+  {'note',  56, 0},
+  {'note',  72, 0},
+  {'note',  88, 0},
+  {'note', 104, 0},
+  {'note', 120, 0}
 }
 --left to right
 launchpad.aux.row = {
-  {'cc',   104, 1},
-  {'cc',   105, 2},
-  {'cc',   106, 3},
-  {'cc',   107, 4},
-  {'cc',   108, 5},
-  {'cc',   109, 6},
-  {'cc',   110, 7},
-  {'cc',   111, 8}
+  {'cc',   104, 0},
+  {'cc',   105, 0},
+  {'cc',   106, 0},
+  {'cc',   107, 0},
+  {'cc',   108, 0},
+  {'cc',   109, 0},
+  {'cc',   110, 0},
+  {'cc',   111, 0}
 }
-
-launchpad.cc_event_handlers = {}
-
--- "Arrow buttons"
-launchpad.cc_event_handlers[104] = function(self,val) self:change_quad(1) end
-launchpad.cc_event_handlers[105] = function(self,val) self:change_quad(2) end
-launchpad.cc_event_handlers[106] = function(self,val) self:change_quad(3) end
-launchpad.cc_event_handlers[107] = function(self,val) self:change_quad(4) end
-
-function launchpad:cc_handler(vgrid,midi_msg)
-  if self.cc_event_handlers[midi_msg.cc] then
-    self.cc_event_handlers[midi_msg.cc](self,midi_msg.val)
-  else
-    print('LP Unhandled CC '.. midi_msg.cc)
-  end
-end
 
 return launchpad
