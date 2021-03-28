@@ -1,29 +1,5 @@
 local launchpad = include('midigrid/lib/devices/generic_device')
 
---these are LP keys to the sides of our grid
---not necessary for strict grid emulation but handy!
---they are up to down, so 89 is the auxkey to row 1
-launchpad.auxcol = {89,79,69,59,49,39,29,19}
-
---left to right, 91 is aux key to column 1
-launchpad.auxrow = {91,92,93,94,95,96,97,98}
-launchpad.quad_leds = {notes = {91,92,93,94}}
-
-launchpad.cc_event_handlers = {}
-launchpad.cc_event_handlers[91] = function(self,val) self:change_quad(1) end
-launchpad.cc_event_handlers[92] = function(self,val) self:change_quad(2) end
-launchpad.cc_event_handlers[93] = function(self,val) self:change_quad(3) end
-launchpad.cc_event_handlers[94] = function(self,val) self:change_quad(4) end
-
-function launchpad:cc_handler(vgrid,midi_msg)
-  if self.cc_event_handlers[midi_msg.cc] then
-    self.cc_event_handlers[midi_msg.cc](self,midi_msg.val)
-  else
-    -- Ignore unhandled CC messages
-    --print('Unhandled CC '.. midi_msg.cc)
-  end
-end
-
 launchpad.grid_notes= {
   {81,82,83,84,85,86,87,88},
   {71,72,73,74,75,76,77,78},
@@ -35,7 +11,8 @@ launchpad.grid_notes= {
   {11,12,13,14,15,16,17,18}
 }
 
-launchpad.brightness_map = {0,
+launchpad.brightness_map = {
+  0,
   11,
   100,
   125,
@@ -51,6 +28,36 @@ launchpad.brightness_map = {0,
   13,
   12,
   119
+}
+
+launchpad.aux = {}
+
+-- Format is { 'cc'/'note', cc or note number, current/default state (1-16) }
+--top to bottom
+
+--these are LP keys to the sides of our grid
+--not necessary for strict grid emulation but handy!
+--they are up to down, so 89 is the auxkey to row 1
+launchpad.aux.col = {
+  {'note', 89, 0},
+  {'note', 79, 0},
+  {'note', 69, 0},
+  {'note', 59, 0},
+  {'note', 49, 0},
+  {'note', 39, 0},
+  {'note', 29, 0},
+  {'note', 19, 0}
+}
+--left to right, 91 is aux key to column 1
+launchpad.aux.row = {
+  {'note', 91, 0},
+  {'note', 92, 0},
+  {'note', 93, 0},
+  {'note', 94, 0},
+  {'note', 95, 0},
+  {'note', 96, 0},
+  {'note', 97, 0},
+  {'note', 98, 0}
 }
 
 return launchpad

@@ -163,12 +163,16 @@ end
 function device:aux_row_handler(btn,val)
   if (self.aux and self.aux.row and self.aux.row_handlers and self.aux.row_handlers[btn]) then
     self.aux.row_handlers[btn](self,val)
+  else
+    print("aux row ", btn)
   end
 end
 
 function device:aux_col_handler(btn,val)
   if (self.aux and self.aux.col and self.aux.col_handlers and self.aux.col_handlers[btn]) then
     self.aux.col_handlers[btn](self,val)
+  else
+    print("aux col ", btn)
   end
 end
 
@@ -241,7 +245,7 @@ function device:rotate_ccw()
   
   --Rotate the Aux buttons
   --Unpack Quick&Dirty copy
-  local new_aux_row = {} --{table.unpack(self.aux.col)}
+  local new_aux_row = {table.unpack(self.aux.col)}
   local new_aux_col = {}
   
   
@@ -251,11 +255,12 @@ function device:rotate_ccw()
   	new_aux_col[#new_aux_col+1] = { self.aux.row[i][1], self.aux.row[i][2], self.aux.row[i][3] }
    end
   
-  --Copy the aux column, otherwise it will be upside down
+  --[[Copy the aux column, otherwise it will be upside down
   for i=1,#self.aux.col do
     if self.aux.col[i] == nil then print("no aux row btn #",i) end
   	new_aux_row[#new_aux_row+1] = { self.aux.col[i][1], self.aux.col[i][2], self.aux.col[i][3] }
   end
+  ]]
 
   self.aux.row = new_aux_row
   self.aux.col = new_aux_col
