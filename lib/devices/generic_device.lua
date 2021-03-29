@@ -115,6 +115,9 @@ end
 device._key_callback = function() print('no vgrid event handle callback attached!') end
 
 function device:refresh(quad)
+  --Trigger a context update
+  if (midigrid.context) then midigrid.context.update(self) end
+  
   if quad.id == self.current_quad then
     if self.refresh_counter > 9 then
       self.force_full_refresh = true

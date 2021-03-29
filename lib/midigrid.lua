@@ -42,20 +42,19 @@ function midigrid.connect(dummy_id)
   end
 
   local connected_devices = midigrid._load_midi_devices(midi_devices)
-
+  vgrid:attach_devices(connected_devices)
+  midigrid.setup_connect_handling()
+  
   --Look for a context for the currenty running script
   context_file = "midigrid/lib/contexts/"..norns.state.name
   print(_path.code .. context_file .. ".lua")
   if (util.file_exists(_path.code .. context_file .. ".lua")) then
     print("Found midigrid context for " .. norns.state.name)
-    context = include(context_file)
-    context.start(connected_devices)
+    midigrid.context = include(context_file)
+    midigrid.context.start(connected_devices)
   else
     print("No midigrid context for " .. norns.state.name .. " was found")
   end
-
-  vgrid:attach_devices(connected_devices)
-  midigrid.setup_connect_handling()
 
   --Expose midigrid globally
   _ENV.midigrid = midigrid
