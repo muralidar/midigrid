@@ -1,20 +1,10 @@
---[[ cheapskate lib for getting midi grid devices to behave like monome grid devices
-     two things are run before returning, `setup_connect_handling()` and `update_devices()`.
-     `setup_connect_handling()` copies over 'og' midi "add" and "remove" callbacks, and
-     provides its own add and remove handlers, i.e. the call backs for:
-       - `midi.add()`
-       - `midi.remove()`
-       - `midi.update_devices()`
-     `find_midi_device_id()` iterates through `midi.devices` to see if the name matches, then
-     returns `id`, this system manages its own ids, which is why you have to initialize it and
-     why first, you connect to it (`midigrid.connect()`), which returns a midigrid object and
-     does `set_midi_handler()`
-]]
+--[[ cheapskate lib for getting midi grid devices to behave like monome grid devices ]]
 
 local vgrid = include('midigrid/lib/vgrid')
 local supported_devices = include('midigrid/lib/supported_devices')
 
 local midigrid = {
+  is_midigrid = true,
   vgrid = vgrid,
   core_grid = grid,
   core_midi_add = nil,
@@ -31,6 +21,9 @@ function midigrid:init(layout)
 end
 
 function midigrid.connect(dummy_id)
+  --Only instantate midigrid once!
+  if _ENV.midigrid then return _ENV.midigrid end
+  
   if midigrid.vgrid.layout == nil then
     print("Default 64 layout init")
     -- User is calling connect without calling init, default to 64 button layout
@@ -50,9 +43,6 @@ function midigrid.connect(dummy_id)
 
   local connected_devices = midigrid._load_midi_devices(midi_devices)
 
-  print("Connected devices:")
-  tab.print(connected_devices)
-  
   --Look for a context for the currenty running script
   context_file = "midigrid/lib/contexts/"..norns.state.name
   print(_path.code .. context_file .. ".lua")
@@ -65,9 +55,11 @@ function midigrid.connect(dummy_id)
   end
 
   vgrid:attach_devices(connected_devices)
-
   midigrid.setup_connect_handling()
 
+  --Expose midigrid globally
+  _ENV.midigrid = midigrid
+  
   return midigrid
 end
 
@@ -82,15 +74,16 @@ function midigrid._find_midigrid_devices()
   local found_device = nil
   local mounted_devices = {}
 
-  print("core midi devices")
-  tab.print(midi.devices)
-
+  print(tab.count(midi.devices)," core midi devices")
+  print("Scanning for supported midigrid devices:")
   for _, dev in pairs(midi.devices) do
     found_device = supported_devices.find_midi_device_type(dev)
 
     if found_device then 
-      print("Dev" .. dev.id .." FD "..found_device)
+      print(found_device," -- Supported")
       mounted_devices[dev.id] = found_device 
+    else
+      print(dev.name," -- Not supported")
     end
   end
 
@@ -138,6 +131,7 @@ end
 
 function midigrid:rotation(dir)
   --TODO Is there a sane way to implement this with multi device?
+  --TODO impement for single 64 device
 end
 
 function midigrid:all(z)
