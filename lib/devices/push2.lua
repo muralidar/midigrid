@@ -17,30 +17,45 @@ push.grid_notes = {
 
 -- probably want to change these as I've not thought to much about them at this point :-)
 push.brightness_map = {0,11,11,9,9,9,13,13,51,51,51,49,49,59,59,57}
+push.rotate_second_device = false
 
+push.aux = {}
+-- Format is { 'cc'/'note', cc or note number, current/default state (1-16) }
+--top to bottom
+push.aux.col = {
+  {'cc',   43, 0},
+  {'cc',   42, 0},
+  {'cc',   41, 0},
+  {'cc',   40, 0},
+  {'cc',   39, 0},
+  {'cc',   38, 0},
+  {'cc',   37, 0},
+  {'cc',   36, 0}
+}
+--left to right
+push.aux.row = {
+  {'cc',   20, 0},
+  {'cc',   21, 0},
+  {'cc',   22, 0},
+  {'cc',   23, 0},
+  {'cc',   24, 0},
+  {'cc',   25, 0},
+  {'cc',   26, 0},
+  {'cc',   27, 0},
+  {'cc',   44, 0}, -- Left arrow
+  {'cc',   45, 0}, -- Right arrow
+  {'cc',   46, 0}, -- Up arrow
+  {'cc',   47, 0}, -- Down arrow
+  
+}
 
-push.auxcol = {102,103,104,105,106,107,108,109}
-push.auxrow = {20,21,22,23,24,25,26,27}
-
--- no pads to control quad
-push.quad_leds = {notes = nil}
-
--- todo: add CCs for controlling quads?
--- push.quad_leds = {CC = {}}
-
--- todo decide what to do here as we have a lot of buttons
-push.cc_event_handlers = {}
-push.cc_event_handlers[20] = function(self,val)  self:change_quad(1) end
-push.cc_event_handlers[21] = function(self,val)  self:change_quad(2) end
-push.cc_event_handlers[22] = function(self,val)  self:change_quad(3) end
-push.cc_event_handlers[23] = function(self,val)  self:change_quad(4) end
-
-function push:cc_handler(vgrid,midi_msg)
-      if self.cc_event_handlers[midi_msg.cc] then
-            self.cc_event_handlers[midi_msg.cc](self,midi_msg.val)
-      else
-            print('Unhandled CC '.. midi_msg.cc)
-      end
+function push:create_quad_handers(quad_count)
+  -- Auto create Quad switching handlers attached to left and right arrow buttons
+  if quad_count > 1 then
+    for q = 1,quad_count do
+      self.aux.row_handlers[q+8] = function(self,val) self:change_quad(q) end
+    end
+  end
 end
 
 return push

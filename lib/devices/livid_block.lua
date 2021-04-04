@@ -11,6 +11,6 @@ block.grid_notes= {
   {112,113,114,115,116,117,118,119}
 }
 
---block.reset_device_msg = { 0xB0, 0x00, 0x00 }
+--block.init_device_msg = { }
 
 return block

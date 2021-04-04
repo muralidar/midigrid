@@ -44,55 +44,39 @@ function Vgrid:init(layout)
       self.new_quad(4,8,8,8,8)
       self.height = 16
     end
-
-  elseif layout == 'cheat_codes' then
-    -- TODO check this is correct
-    self.new_quad(1,5,8,0,0)
-    self.new_quad(2,5,8,5,0)
-    self.new_quad(3,5,8,10,0)
-    self.new_quad(4,1,8,15,0) -- Aux row
-    -- TODO cheat codes layout still needs work to mirror "AUX" row
-    self.locate_in_layout = function(self,x,y)
-      if (x > self.width or y > self.height) then return nil end
-      -- 3 grids of 5x8 + 1x8 Aux
-      return (x//6)+1
-    end
-
   else
     print("ERROR: Unknown layout " .. layout)
   end
 end
 
-function Vgrid:attach_devices(devices)
-  print('attaching devices:')
-  tab.print(devices)
-  for _, dev in pairs(devices) do
-    self:attach_device(dev)
-  end
-end
-
-function Vgrid:attach_device(dev)
-  -- Assign to quads based on number of currently attached devices
-  -- e.g. dev1 = quad1, dev2 = quad2, ...
-  dev.current_quad = ((tab.count(self.devices)-1) % tab.count(self.quads))+1
-  table.insert(self.devices,dev)
+function Vgrid:attach_devices(compatible_devices)
+  local device_number
+  local device_count = tab.count(compatible_devices)
+  print('Attaching devices:')
+  for dev_id, dev in pairs(compatible_devices) do
+    
+    
+    -- Yes, Midi grid mounts devices "backwards"
+    device_number = device_count - tab.count(self.devices)
+    
+    -- Assign to quads based on number of currently attached devices
+    -- e.g. dev1 = quad1, dev2 = quad2, ...
+    if (device_count > 1) then
+      dev.current_quad = (device_number % tab.count(self.quads))+1
+    end
+    
+    table.insert(self.devices,dev)
   
-  -- Create reverse lookup tables for device
-  dev:create_rev_lookups()
-
-  -- Set call back for real device events to become virtual grid events
-  midi.devices[dev.midi_id].event = function(e) dev.event(dev,self,e) end
+    -- Set call back for real device events to become virtual grid events
+    midi.devices[dev.midi_id].event = function(e) dev.event(dev,self,e) end
+    
+    dev._key_callback = function(dev_quad,dev_x,dev_y,state) 
+      self:_handle_grid_key(dev_quad,dev_x,dev_y,state) 
+    end
   
-  dev._key_callback = function(dev_quad,dev_x,dev_y,state) 
-    self:_handle_grid_key(dev_quad,dev_x,dev_y,state) 
+    -- Call device init
+    dev:_init(self,device_number)
   end
-
-  -- Call device init if set
-  if dev._init then
-    dev:_init()
-  end
-  -- Reset the device
-  dev:_reset()
 end
 
 function Vgrid:_handle_grid_key(quad_id,qx,qy,state)
