@@ -17,30 +17,45 @@ push.grid_notes = {
 
 -- probably want to change these as I've not thought to much about them at this point :-)
 push.brightness_map = {0,11,11,9,9,9,13,13,51,51,51,49,49,59,59,57}
+push.rotate_second_device = false
 
 push.aux = {}
 -- Format is { 'cc'/'note', cc or note number, current/default state (1-16) }
 --top to bottom
 push.aux.col = {
-  {'note', 102, 0},
-  {'note', 103, 0},
-  {'note', 104, 0},
-  {'note', 105, 0},
-  {'note', 106, 0},
-  {'note', 107, 0},
-  {'note', 108, 0},
-  {'note', 109, 0}
+  {'cc',   43, 0},
+  {'cc',   42, 0},
+  {'cc',   41, 0},
+  {'cc',   40, 0},
+  {'cc',   39, 0},
+  {'cc',   38, 0},
+  {'cc',   37, 0},
+  {'cc',   36, 0}
 }
 --left to right
 push.aux.row = {
-  {'note', 20, 0},
-  {'note', 21, 0},
-  {'note', 22, 0},
-  {'note', 23, 0},
-  {'note', 24, 0},
-  {'note', 25, 0},
-  {'note', 26, 0},
-  {'note', 27, 0}
+  {'cc',   20, 0},
+  {'cc',   21, 0},
+  {'cc',   22, 0},
+  {'cc',   23, 0},
+  {'cc',   24, 0},
+  {'cc',   25, 0},
+  {'cc',   26, 0},
+  {'cc',   27, 0},
+  {'cc',   44, 0}, -- Left arrow
+  {'cc',   45, 0}, -- Right arrow
+  {'cc',   46, 0}, -- Up arrow
+  {'cc',   47, 0}, -- Down arrow
+  
 }
+
+function push:create_quad_handers(quad_count)
+  -- Auto create Quad switching handlers attached to left and right arrow buttons
+  if quad_count > 1 then
+    for q = 1,quad_count do
+      self.aux.row_handlers[q+8] = function(self,val) self:change_quad(q) end
+    end
+  end
+end
 
 return push

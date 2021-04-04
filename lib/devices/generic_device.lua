@@ -30,9 +30,6 @@ local device={
     col = {},
     row = {}
   },
-  
-  --as of now, order is important here
-  quad_leds = {notes = {64,65,66,67}},
 
   -- the currently displayed quad on the device
   quad_switching_enabled = true,
@@ -41,7 +38,6 @@ local device={
 
   force_full_refresh = false,
 
-  device_name = 'generic'
 }
 
 function device:change_quad(quad)
@@ -51,6 +47,8 @@ end
 
 function device:_init(vgrid,device_number)
   self.vgrid = vgrid
+  
+  --if (self.)
   
   if (device_number == 2 and self.rotate_second_device) then
     self:rotate_ccw()
@@ -63,20 +61,24 @@ function device:_init(vgrid,device_number)
   self.aux.row_handlers = {}
   self.aux.col_handlers = {}
   
-  -- Auto create Quad switching handlers
-  if #vgrid.quads > 1 then
-    for q = 1,#vgrid.quads do
-      self.aux.row_handlers[q] = function(self,val) self:change_quad(q) end
-    end
-  end
+  self:create_quad_handers(#vgrid.quads)
   
   -- Reset device
   self:_reset()
 end
 
+function device:create_quad_handers(quad_count)
+  -- Auto create Quad switching handlers
+  if quad_count > 1 then
+    for q = 1,quad_count do
+      self.aux.row_handlers[q] = function(self,val) self:change_quad(q) end
+    end
+  end
+end
+
 function device:_reset()
-  if self.reset_device_msg then
-    midi.devices[self.midi_id]:send(self.reset_device_msg)
+  if self.init_device_msg then
+    midi.devices[self.midi_id]:send(self.init_device_msg)
   else
     --TODO: Reset all leds on device
   end
@@ -179,7 +181,7 @@ function device:aux_col_handler(btn,val)
   end
 end
 
-function device:update_aux()
+function device:update_quad_btn_aux()
   -- TODO would be good to only update on dirty AUX?
   if self.vgrid and #self.vgrid.quads > 1 and self.quad_switching_enabled == true then
     for q = 1,#self.vgrid.quads do
@@ -189,6 +191,10 @@ function device:update_aux()
       end
     end
   end
+end
+
+function device:update_aux()
+  self:update_quad_btn_aux()
   -- Light the Aux LEDs
   if self.aux.row then
     for _,button in pairs(self.aux.row) do

@@ -28,7 +28,8 @@ launchpad.brightness_map = {0,16,16,32,32,48,48,49,49,33,33,50,50,34,51,51}
 -- Rainbow
 --launchpad.brightness_map = {0, 16, 32, 48, 1, 17, 33, 49, 2, 18, 34, 50, 3, 19, 35, 51}
 
-launchpad.reset_device_msg = { 0xB0, 0x00, 0x00 }
+-- Reset and set mode to XY
+launchpad.init_device_msg = { 0xB0, 0x00, 0x00, 0xB0, 0x00, 0x01 }
 
 launchpad.aux = {}
 -- Format is { 'cc'/'note', cc or note number, current/default state (1-16) }

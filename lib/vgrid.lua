@@ -61,7 +61,10 @@ function Vgrid:attach_devices(compatible_devices)
     
     -- Assign to quads based on number of currently attached devices
     -- e.g. dev1 = quad1, dev2 = quad2, ...
-    dev.current_quad = (device_number % tab.count(self.quads))+1
+    if (device_count > 1) then
+      dev.current_quad = (device_number % tab.count(self.quads))+1
+    end
+    
     table.insert(self.devices,dev)
   
     -- Set call back for real device events to become virtual grid events

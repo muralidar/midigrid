@@ -1,20 +1,17 @@
 local supported_devices = {
   midi_devices = {
     
-    -- Misc grid devices
-    
-    {  midi_base_name= 'apc mini',         device_type='apc_mini'      },
-    {  midi_base_name= 'block 1',          device_type='livid_block'   },
+    -- Basic midi grid devices
+    { midi_base_name= 'apc mini',         device_type='apc_mini'      },
+    { midi_base_name= 'block 1',          device_type='livid_block'   },
 
-    -- Ableton Push 2
-    {  midi_base_name= 'ableton push 2 1',          device_type='push2'   },
-
-    -- Novation Launchpads 
+    -- Novation Launchpads Gen.1
     
-    {  midi_base_name= 'launchpad',        device_type='launchpad'       },
-    {  midi_base_name= 'launchpad s',      device_type='launchpad'       },
-    {  midi_base_name= 'launchpad mini',   device_type='launchpad'       },
-    {  midi_base_name= 'launchpad mk2',    device_type='launchpad_rgb'   },
+    { midi_base_name= 'launchpad',        device_type='launchpad'       },
+    { midi_base_name= 'launchpad s',      device_type='launchpad'       },
+    { midi_base_name= 'launchpad mini',   device_type='launchpad'       },
+    
+    -- Novation Launchpads Gen.2
     --
     -- LP Mini MK3 presents two MIDI interfaces over USB:
     --   launchpad mini mk3 1 - LPMiniMK3 DAW I/O (or first interface): For use
@@ -29,17 +26,14 @@ local supported_devices = {
     --   launchpad mini mk3 1 2
     --   launchpad mini mk3 2 2
     -- LP Mini MK3 needs to be put in Programmer mode manually for midigrid use.
-    {  midi_base_name= 'launchpad mini mk3 2', device_type='launchpad_minimk3' },
-    {  midi_base_name= 'launchpad mini mk3 2 2', device_type='launchpad_minimk3_128' },
-    {  midi_base_name= 'launchpad x 2', device_type='launchpad_x' },
+    { midi_base_name= 'launchpad mk2',         device_type='launchpad_rgb'   },
+    { midi_base_name= 'launchpad mini mk3 2',  device_type='launchpad_minimk3' },
+    { midi_base_name= 'launchpad pro mk3',     device_type='launchpad_rgb' },
+    { midi_base_name= 'launchpad x 2',         device_type='launchpad_x' },
     
---[[ Known devices to be implemented, help required!
-     Old launchpad mini's have user set hardware ID 1 - 16:
-     e.g. ID 4 appears as midi_device.name "Launchpad Mini 4"
-    {  midi_base_name= 'launchpad mk2 ? ',    device_type='launchpadmk2'  },
-    {  midi_base_name= 'launchpad pro 2',  device_type='launchpadpro2' },
-    {  midi_base_name: 'launchpad mk3'      device_type:'launchpadmk3' },
-]]--
+    -- Ableton Push 2
+    { midi_base_name= 'ableton push 2 1',          device_type='push2'   },
+
   }
 }
 
