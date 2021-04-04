@@ -38,7 +38,6 @@ local device={
 
   force_full_refresh = false,
 
-  device_name = 'generic'
 }
 
 function device:change_quad(quad)
@@ -48,6 +47,8 @@ end
 
 function device:_init(vgrid,device_number)
   self.vgrid = vgrid
+  
+  --if (self.)
   
   if (device_number == 2 and self.rotate_second_device) then
     self:rotate_ccw()
@@ -76,8 +77,8 @@ function device:create_quad_handers(quad_count)
 end
 
 function device:_reset()
-  if self.reset_device_msg then
-    midi.devices[self.midi_id]:send(self.reset_device_msg)
+  if self.init_device_msg then
+    midi.devices[self.midi_id]:send(self.init_device_msg)
   else
     --TODO: Reset all leds on device
   end

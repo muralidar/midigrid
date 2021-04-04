@@ -41,7 +41,21 @@ push.aux.row = {
   {'cc',   24, 0},
   {'cc',   25, 0},
   {'cc',   26, 0},
-  {'cc',   27, 0}
+  {'cc',   27, 0},
+  {'cc',   44, 0}, -- Left arrow
+  {'cc',   45, 0}, -- Right arrow
+  {'cc',   46, 0}, -- Up arrow
+  {'cc',   47, 0}, -- Down arrow
+  
 }
+
+function push:create_quad_handers(quad_count)
+  -- Auto create Quad switching handlers attached to left and right arrow buttons
+  if quad_count > 1 then
+    for q = 1,quad_count do
+      self.aux.row_handlers[q+8] = function(self,val) self:change_quad(q) end
+    end
+  end
+end
 
 return push
