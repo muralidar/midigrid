@@ -50,14 +50,14 @@ launchpad.aux.col = {
 }
 --left to right, 91 is aux key to column 1
 launchpad.aux.row = {
-  {'note', 91, 0},
-  {'note', 92, 0},
-  {'note', 93, 0},
-  {'note', 94, 0},
-  {'note', 95, 0},
-  {'note', 96, 0},
-  {'note', 97, 0},
-  {'note', 98, 0}
+  {'cc', 104, 0},
+  {'cc', 105, 0},
+  {'cc', 106, 0},
+  {'cc', 107, 0},
+  {'cc', 108, 0},
+  {'cc', 109, 0},
+  {'cc', 110, 0},
+  {'cc', 111, 0}
 }
 
 return launchpad
