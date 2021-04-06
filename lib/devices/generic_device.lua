@@ -15,6 +15,7 @@ local device={
   width=8,
   height=8,
   rotate_second_device=true,
+  device_number = 1,
 
   vgrid={},
   midi_id = 1,
@@ -46,6 +47,7 @@ function device:change_quad(quad)
 end
 
 function device:_init(vgrid,device_number)
+  self.device_number = device_number
   self.vgrid = vgrid
   
   --if (self.)
@@ -53,10 +55,10 @@ function device:_init(vgrid,device_number)
   if (device_number == 2 and self.rotate_second_device) then
     self:rotate_ccw()
   end
-  
+
   -- Create reverse lookup tables for device
   self:create_rev_lookups()
-  
+
   -- Tabls for aux button handlers
   self.aux.row_handlers = {}
   self.aux.col_handlers = {}
@@ -119,7 +121,7 @@ device._key_callback = function() print('no vgrid event handle callback attached
 function device:refresh(quad)
   --Trigger a context update
   if (midigrid.context) then midigrid.context.update(self) end
-  
+
   if quad.id == self.current_quad then
     if self.refresh_counter > 9 then
       self.force_full_refresh = true
@@ -143,7 +145,7 @@ function device:_aux_btn_handler(type, msg, state)
   else
     aux_event = self.aux.note_lookup[msg]
   end
-  
+
   if aux_event and aux_event[1] == 'row' then
     device:aux_row_handler(aux_event[2], state)
   elseif aux_event and aux_event[1] == 'col' then
@@ -198,7 +200,7 @@ function device:update_aux()
   -- Light the Aux LEDs
   if self.aux.row then
     for _,button in pairs(self.aux.row) do
-      if button[3] == nil then 
+      if button[3] == nil then
         --ignore handlers!
       else
         if button[1] == 'cc' then
@@ -210,9 +212,9 @@ function device:update_aux()
     end
   end
   if self.aux.col then
-    
+
     for _,button in pairs(self.aux.col) do
-      if button[3] == nil then 
+      if button[3] == nil then
       --ignore handlers!
       else
         if button[1] == 'cc' then
@@ -251,19 +253,19 @@ function device:rotate_ccw()
     end
   end
   self.grid_notes = new_grid_notes
-  
+
   --Rotate the Aux buttons
   --Unpack Quick&Dirty copy
   local new_aux_row = {table.unpack(self.aux.col)}
   local new_aux_col = {}
-  
-  
+
+
   --Flip the aux column, otherwise it will be upside down
   for i=#self.aux.row, 1, -1 do
     if self.aux.row[i] == nil then print("no aux row btn #",i) end
   	new_aux_col[#new_aux_col+1] = { self.aux.row[i][1], self.aux.row[i][2], self.aux.row[i][3] }
    end
-  
+
   --[[Copy the aux column, otherwise it will be upside down
   for i=1,#self.aux.col do
     if self.aux.col[i] == nil then print("no aux row btn #",i) end
@@ -282,10 +284,10 @@ function device:create_rev_lookups()
       self.note_to_grid_lookup[self.grid_notes[col][row]] = {x=row,y=col}
     end
   end
-  
+
   --Create reverse lookup for aux col and row
   if self.aux and self.aux.cc_lookup == nil then self.aux.cc_lookup = {} end
-  if self.aux and self.aux.note_lookup == nil then self.aux.note_lookup = {} end  
+  if self.aux and self.aux.note_lookup == nil then self.aux.note_lookup = {} end
   if self.aux.row then
     for btn_number,btn_meta in ipairs(self.aux.row) do
       if btn_meta[1] == 'cc' then
