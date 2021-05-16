@@ -17,6 +17,7 @@ local supported_devices = include('midigrid/lib/supported_devices')
 local midigrid = {
   is_midigrid = true,
   vgrid = vgrid,
+  device = nil,
   core_grid = grid,
   core_midi_add = nil,
   core_midi_remove = nil,
@@ -53,6 +54,11 @@ function midigrid.connect(dummy_id)
   end
 
   local connected_devices = midigrid._load_midi_devices(midi_devices)
+  
+  -- Some script check grid.device is not nil to prove a grid is attached
+  if connected_devices then
+    midigrid.device = true  
+  end
 
   vgrid:attach_devices(connected_devices)
   midigrid.setup_connect_handling()
