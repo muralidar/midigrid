@@ -34,6 +34,9 @@ local supported_devices = {
 
     -- Ableton Push 2
     { midi_base_name= 'ableton push 2 1',          device_type='push2'   },
+    
+    -- Linnstrument
+    { midi_base_name= 'linnstrument midi',          device_type='linnstrument'   },
 
   }
 }
