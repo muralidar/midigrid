@@ -1,5 +1,5 @@
 -- Linnstrument support file by @nightmachines
--- 2021-05-17
+-- 2021-05-18
 --
 -- Thanks to @jaggednz
 
@@ -38,7 +38,8 @@ local device={
   -- 0=as set in Note Lights settings, 1=red, 2=yellow, 3=green, 4=cyan, 5=blue, 6=magenta, 7=OFF, 8=white, 9= orange, 10=lime and 11=pink
 
   
-  init_device_msg = {}, -- TODO figure out how to send NPRN 245 value 1
+  init_device_msg = { 0x63, 0x01, 0x62, 0x75, 0x06, 0x00, 0x26, 0x00, 0x65, 0x7f, 0x64, 0x7f, -- send NPRN 245 value 0 to set Linnstrument to normal mode to clear LEDs afterwards
+                      0x63, 0x01, 0x62, 0x75, 0x06, 0x00, 0x26, 0x01, 0x65, 0x7f, 0x64, 0x7f } , -- send NPRN 245 value 1 to set Linnstrument to user firmware mode, clearing all LEDs
 
   current_quad = 1,
 
@@ -53,8 +54,15 @@ end
 function device:_reset()
   if self.init_device_msg then
     midi.devices[self.midi_id]:send(self.init_device_msg)
+    -- midi.devices[self.midi_id]:cc(99,1,1) -- NRPN most significant byte
+    -- midi.devices[self.midi_id]:cc(98,117,1) -- NRPN least significant byte
+    -- midi.devices[self.midi_id]:cc(6,0,1) -- 0 not used
+    -- midi.devices[self.midi_id]:cc(38,1,1) -- 1 = enable user firmware mode
+    -- midi.devices[self.midi_id]:cc(101,127,1) --reset
+    -- midi.devices[self.midi_id]:cc(100,127,1) --reset
+    print("msg")
   else
-    --TODO: Reset all leds on device
+    
   end
 end
 
@@ -71,7 +79,7 @@ function device.event(self,vgrid,event)
   local midi_msg = midi.to_msg(event)
 
   -- Debug incomming midi messages
---  print(midi_msg.type)
+  --print(midi_msg.type..midi_msg.cc..midi_msg.val..midi_msg.ch)
 
   if (midi_msg.type == 'note_on' or midi_msg.type == 'note_off') then
     local state = (midi_msg.type == 'note_on') and 1 or 0
